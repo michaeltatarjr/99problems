@@ -1,0 +1,109 @@
+99 problems…and SQL is the solution!
+
+This is an ongoing list of Postgre SQL problems I’ve worked through via Strata Scratch, codewars and other websites. 
+
+#1
+You're tasked with analyzing a Spotify-like dataset that captures user listening habits.
+For each user, calculate the total listening time and the count of unique songs they've listened to. In the database duration values are displayed in seconds. Round the total listening duration to the nearest whole minute.
+The output should contain three columns: 'user_id', 'total_listen_duration', and 'unique_song_count'.
+
+SELECT
+   user_id,
+   COUNT(DISTINCT(song_id)) as unique_song_count,
+   ROUND(SUM(listen_duration/60)) as total_listen_duration
+FROM
+listening_habits
+GROUP BY
+user_id
+
+#2
+For each week, find the total number of orders. Include only the orders that are from the first quarter of 2023.
+The output should contain 'week' and 'quantity'.
+
+SELECT
+   week,
+   sum(quantity)
+FROM orders_analysis
+WHERE week BETWEEN '2023-01-01' AND '2023-04-01'
+GROUP BY week
+
+#3
+You are given a dataset from Amazon that tracks and aggregates user activity on their platform in certain time periods. For each device type, find the time period with the highest number of active users. The output should contain 'user_count', 'time_period', and 'device_type', where 'time_period' is a concatenation of 'start_timestamp' and 'end_timestamp', like ; "start_timestamp to end_timestamp".
+
+
+SELECT
+    user_count,
+    concat(start_timestamp, ' to ', end_timestamp) as time_period,
+    device_type
+FROM user_activity
+WHERE user_count = (SELECT max(user_count) FROM user_activity)
+
+
+#4
+We have a table with employees and their salaries, however, some of the records are old and contain outdated salary information. Find the current salary of each employee assuming that salaries increase each year. Output their id, first name, last name, department ID, and current salary. Order your list by employee ID in ascending order.
+
+SELECT
+   id,
+   first_name,
+   last_name,
+   department_id,
+   max(salary)
+FROM ms_employee_salary
+GROUP BY id,2,3,4
+ORDER BY department_id ASC
+
+#5
+Find all inspections which are part of an inactive program.
+Table: los_angeles_restaurant_health_inspections
+(NOTE: For some reason single quotes works better)
+
+SELECT 
+* 
+FROM los_angeles_restaurant_health_inspections
+WHERE program_status = 'INACTIVE'
+
+#6
+Order all countries by the year they first participated in the Olympics. Output the National Olympics Committee (NOC) name along with the desired year. Sort records by the year and the NOC in ascending order.
+
+SELECT
+   noc,
+   MIN(year) as first_year
+FROM olympics_athletes_events
+GROUP BY noc
+ORDER BY noc ASC
+
+
+
+
+#7
+Find the total cost of each customer's orders. Output customer's id, first name, and the total order cost. Order records by customer's first name alphabetically.
+
+SELECT 
+   c.id,
+   c.first_name,
+SUM(o.total_order_cost) as total_cost
+FROM customers as c
+JOIN orders as o
+on c.id = o.cust_id
+GROUP BY 1,2
+ORDER BY total_cost DESC
+
+#8
+Find the last time each bike was in use. Output both the bike number and the date-timestamp of the bike's last use (i.e., the date-time the bike was returned). Order the results by bikes that were most recently used.
+
+SELECT 
+   bike_number,
+   MAX(end_time)
+FROM dc_bikeshare_q1_2012
+GROUP BY 1
+ORDER BY 2 DESC
+
+#9
+Find the total number of records that belong to each variety in the dataset. Output the variety along with the corresponding number of records. Order records by the variety in ascending order.
+
+SELECT 
+   variety,
+   COUNT(variety) as count
+FROM iris
+GROUP BY 1
+
