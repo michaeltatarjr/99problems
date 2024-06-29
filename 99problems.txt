@@ -7,28 +7,40 @@ You're tasked with analyzing a Spotify-like dataset that captures user listening
 For each user, calculate the total listening time and the count of unique songs they've listened to. In the database duration values are displayed in seconds. Round the total listening duration to the nearest whole minute.
 The output should contain three columns: 'user_id', 'total_listen_duration', and 'unique_song_count'.
 
+
 SELECT
-   user_id,
-   COUNT(DISTINCT(song_id)) as unique_song_count,
-   ROUND(SUM(listen_duration/60)) as total_listen_duration
+user_id,
+COUNT(DISTINCT(song_id)) as unique_song_count,
+ROUND(SUM(listen_duration/60)) as total_listen_duration
 FROM
 listening_habits
 GROUP BY
-user_id
+User_id
+
+
+
 
 #2
 For each week, find the total number of orders. Include only the orders that are from the first quarter of 2023.
 The output should contain 'week' and 'quantity'.
 
+
 SELECT
-   week,
-   sum(quantity)
+week,
+sum(quantity)
 FROM orders_analysis
 WHERE week BETWEEN '2023-01-01' AND '2023-04-01'
 GROUP BY week
 
+
+
+
+
+
 #3
 You are given a dataset from Amazon that tracks and aggregates user activity on their platform in certain time periods. For each device type, find the time period with the highest number of active users. The output should contain 'user_count', 'time_period', and 'device_type', where 'time_period' is a concatenation of 'start_timestamp' and 'end_timestamp', like ; "start_timestamp to end_timestamp".
+
+
 
 
 SELECT
@@ -39,18 +51,26 @@ FROM user_activity
 WHERE user_count = (SELECT max(user_count) FROM user_activity)
 
 
+
+
+
+
+
+
 #4
 We have a table with employees and their salaries, however, some of the records are old and contain outdated salary information. Find the current salary of each employee assuming that salaries increase each year. Output their id, first name, last name, department ID, and current salary. Order your list by employee ID in ascending order.
 
 SELECT
-   id,
-   first_name,
-   last_name,
-   department_id,
-   max(salary)
+id,
+first_name,
+last_name,
+department_id,
+max(salary)
 FROM ms_employee_salary
 GROUP BY id,2,3,4
 ORDER BY department_id ASC
+
+
 
 #5
 Find all inspections which are part of an inactive program.
@@ -62,15 +82,18 @@ SELECT
 FROM los_angeles_restaurant_health_inspections
 WHERE program_status = 'INACTIVE'
 
+
+
 #6
 Order all countries by the year they first participated in the Olympics. Output the National Olympics Committee (NOC) name along with the desired year. Sort records by the year and the NOC in ascending order.
 
 SELECT
-   noc,
-   MIN(year) as first_year
+noc,
+MIN(year) as first_year
 FROM olympics_athletes_events
 GROUP BY noc
 ORDER BY noc ASC
+
 
 
 
@@ -79,8 +102,8 @@ ORDER BY noc ASC
 Find the total cost of each customer's orders. Output customer's id, first name, and the total order cost. Order records by customer's first name alphabetically.
 
 SELECT 
-   c.id,
-   c.first_name,
+c.id,
+c.first_name,
 SUM(o.total_order_cost) as total_cost
 FROM customers as c
 JOIN orders as o
@@ -88,22 +111,189 @@ on c.id = o.cust_id
 GROUP BY 1,2
 ORDER BY total_cost DESC
 
+
+
 #8
 Find the last time each bike was in use. Output both the bike number and the date-timestamp of the bike's last use (i.e., the date-time the bike was returned). Order the results by bikes that were most recently used.
 
 SELECT 
-   bike_number,
-   MAX(end_time)
+bike_number,
+MAX(end_time)
 FROM dc_bikeshare_q1_2012
 GROUP BY 1
 ORDER BY 2 DESC
+
 
 #9
 Find the total number of records that belong to each variety in the dataset. Output the variety along with the corresponding number of records. Order records by the variety in ascending order.
 
 SELECT 
-   variety,
-   COUNT(variety) as count
+variety,
+COUNT(variety) as count
 FROM iris
 GROUP BY 1
+
+
+
+#10
+Table: Products
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| product_id  | int     |
+| low_fats    | enum    |
+| recyclable  | enum    |
++-------------+---------+
+product_id is the primary key (column with unique values) for this table.
+low_fats is an ENUM (category) of type ('Y', 'N') where 'Y' means this product is low fat and 'N' means it is not.
+recyclable is an ENUM (category) of types ('Y', 'N') where 'Y' means this product is recyclable and 'N' means it is not.
+
+
+SELECT
+    product_id
+FROM
+    Products
+WHERE low_fats = 'Y'
+AND recyclable = 'Y'
+
+
+
+#11
+Find the names of the customer that are not referred by the customer with id = 2.
+Return the result table in any order.
+The result format is in the following example.
+
+
+SELECT
+name
+FROM Customer
+WHERE referee_id NOT LIKE '2' OR referee_id IS NULL
+
+
+
+
+#12
+name is the primary key (column with unique values) for this table.
+Each row of this table gives information about the name of a country, the continent to which it belongs, its area, the population, and its GDP value.
+
+
+SELECT
+name,
+population,
+area
+FROM World
+WHERE
+    population >= 25000000
+    OR
+    area >= 3000000;
+
+
+
+
+#13
+There is no primary key (column with unique values) for this table, the table may have duplicate rows.
+Each row of this table indicates that some viewer viewed an article (written by some author) on some date. 
+Note that equal author_id and viewer_id indicate the same person.
+ 
+Write a solution to find all the authors that viewed at least one of their own articles.
+Return the result table sorted by id in ascending order.
+The result format is in the following example.
+
+SELECT
+DISTINCT(author_id) as id
+FROM views
+WHERE viewer_id = author_id
+ORDER BY author_id ASC
+
+
+
+
+#14
+
+Write a solution to find the IDs of the invalid tweets. The tweet is invalid if the number of characters used in the content of the tweet is strictly greater than 15.
+Return the result table in any order.
+The result format is in the following example.
+SELECT
+tweet_id
+FROM Tweets
+WHERE LENGTH(content) > 15
+
+
+
+
+#15
+You are analyzing a social network dataset at Google. Your task is to find mutual friends between two users, Karl and Hans. There is only one user named Karl and one named Hans in the dataset.
+
+The output should contain 'user_id' and 'user_name' columns.
+
+WITH Karlf AS (
+    SELECT *
+    FROM friends
+    WHERE friend_id = '1'
+),
+Hansf AS (
+    SELECT *
+    FROM friends
+    WHERE friend_id = '2'
+)
+SELECT
+    u.user_id,
+    us.user_name
+FROM Karlf u
+JOIN Hansf f
+ON u.user_id = f.user_id
+JOIN users as us
+ON us.user_id = f.user_id
+
+
+
+#16
+You’re given a table of Uber rides that contains the mileage and the purpose for the business expense.  You’re asked to find business purposes that generate the most miles driven for passengers that use Uber for their business transportation. Find the top 3 business purpose categories by total mileage.
+
+WITH bus_expense AS(SELECT
+purpose,
+SUM(miles) AS test
+FROM my_uber_drives
+WHERE purpose IS NOT NULL and category ILIKE '%business%'
+GROUP BY purpose
+)
+SELECT
+purpose,
+test
+FROM bus_expense
+GROUP BY 1,2
+ORDER BY 2 DESC
+LIMIT 3
+
+
+
+
+#17
+
+You are provided with a transactional dataset from Amazon that contains detailed information about sales across different products and marketplaces. Your task is to list the top 3 sellers in each product category for January.
+
+The output should contain 'seller_id' , 'total_sales' ,'product_category' , 'market_place', and 'month'.
+
+
+WITH jan_sales AS (SELECT
+*
+FROM sales_data
+WHERE month ='2024-01'
+),
+sales_rnk AS (
+SELECT 
+*,
+DENSE_RANK() OVER (PARTITION BY product_category ORDER BY total_sales DESC) as ranked
+FROM jan_sales
+)
+
+SELECT
+seller_id,
+total_sales,
+product_category,
+market_place,
+month
+FROM sales_rnk
+WHERE ranked <=3
+ORDER BY product_category, ranked
 
